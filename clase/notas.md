@@ -1,76 +1,151 @@
 # 🗒️ Registro de Trabajo en Clase - Taller 1
 
 ## 📆 Fecha de la sesión
-_Febrero 2026_
+_[Completar con la fecha de la clase]_
 
 ## 👥 Integrantes presentes
-- [Completar con los nombres del equipo]
+- [Nombre 1]
+- [Nombre 2]
+- [Nombre 3]
+
+---
 
 ## 🧠 Actividades realizadas en clase
 
-Durante la sesión de clase se trabajó en el modelado del proceso de agendamiento de citas médicas para la Clínica Salud Viva, que sirvió como caso base de referencia.
+Durante la sesión de clase se trabajó en el modelado del **proceso de agendamiento de citas médicas** para la **Clínica Salud Viva**, caso base de referencia del taller.
 
 ### ¿Qué se discutió con el equipo?
-- Análisis del flujo del proceso de agendamiento de citas
-- Identificación de actores principales: Paciente, Sistema de citas, Base de datos
-- Discusión sobre los eventos de inicio y fin del proceso
-- Identificación de decisiones críticas en el flujo (disponibilidad de médico, validación de datos)
+
+- **Análisis del contexto**: La Clínica Salud Viva es una institución médica de tamaño medio que ofrece atención presencial y virtual
+- **Identificación del proceso**: Agendamiento de citas médicas a través de plataforma digital
+- **Actores identificados**:
+  - Paciente (usuario final)
+  - Sistema de citas (plataforma digital)
+  - Sistema de notificaciones (email/SMS)
+- **Flujo principal discutido**: Selección de especialidad → Médico → Fecha → Confirmación
 
 ### ¿Qué decisiones de modelado se tomaron?
-- Usar swimlanes (carriles) para diferenciar responsabilidades entre actores
-- Incluir eventos de mensaje para notificaciones (correo/SMS)
-- Modelar gateways exclusivos para decisiones binarias
-- Representar tareas del sistema y tareas manuales de manera diferenciada
+
+1. **Uso de swimlanes**: Se decidió dividir el proceso en 3 carriles para separar responsabilidades:
+   - **Paciente**: Acciones del usuario
+   - **Sistema de Citas**: Lógica de agendamiento y validación
+   - **Sistema de Notificaciones**: Envío de confirmaciones
+
+2. **Gateways identificados**:
+   - ¿Médico disponible? (Exclusivo - XOR)
+   - ¿Datos válidos? (Exclusivo - XOR)
+   - Canal de notificación: Email o SMS (Exclusivo - XOR)
+
+3. **Manejo de excepciones**:
+   - Flujo alternativo cuando médico no está disponible
+   - Validación de datos antes de registrar la cita
+   - Sugerencias de médicos alternativos
+
+4. **Eventos de mensaje**: Para representar la comunicación entre:
+   - Paciente → Sistema de citas
+   - Sistema de citas → Sistema de notificaciones
+   - Sistema de notificaciones → Paciente
 
 ### ¿Qué herramientas se usaron?
-- Inicialmente: pizarra y papel para bocetos
-- Digitalización: Mermaid (diagramas en markdown)
-- Documentación: Markdown
+
+- **Boceto inicial**: Pizarra y papel para discutir el flujo
+- **Digitalización**: Mermaid (diagramas como código en formato markdown)
+- **Documentación**: Markdown para registro de notas
+- **Código de colores**: Aplicado para diferenciar tipos de elementos BPMN
 
 ### ¿Qué parte del trabajo se alcanzó a desarrollar?
+
 - ✅ Identificación completa del flujo del proceso
-- ✅ Boceto inicial del diagrama BPMN
-- ✅ Definición de actores y responsabilidades
-- ✅ Identificación de puntos críticos del proceso
+- ✅ Definición de los 3 carriles (swimlanes)
+- ✅ Identificación de eventos de inicio y fin
+- ✅ Mapeo de actividades principales (12 tareas)
+- ✅ Definición de decisiones (3 gateways)
+- ✅ Identificación de flujos alternativos
+- ✅ Digitalización del diagrama BPMN en Mermaid
+
+---
 
 ## 🧩 Boceto inicial del modelo
 
-El proceso de agendamiento se dividió en tres carriles principales:
-1. **Paciente**: Inicia la solicitud y recibe confirmación
-2. **Sistema de citas**: Valida disponibilidad y procesa la solicitud
-3. **Sistema de notificaciones**: Envía confirmaciones
+### Flujo principal identificado:
 
-**Flujo principal identificado:**
+**Carril 1: Paciente**
 ```
-Inicio → Seleccionar especialidad → Seleccionar médico → 
-Verificar disponibilidad → Seleccionar fecha/hora → 
-Confirmar datos → Registrar cita → Enviar notificación → Fin
+Inicio → Ingresar a plataforma → Seleccionar especialidad → 
+Seleccionar médico → Recibir confirmación → Fin
 ```
 
-**Puntos de decisión:**
-- ¿Médico disponible? (Sí/No)
-- ¿Datos válidos? (Sí/No)
-- ¿Confirmación exitosa? (Sí/No)
+**Carril 2: Sistema de Citas**
+```
+Recibir solicitud → Consultar disponibilidad → 
+¿Médico disponible? [Sí/No] →
+  [Sí] → Mostrar fechas → Validar datos → ¿Datos válidos? [Sí/No] →
+    [Sí] → Registrar cita → Enviar notificación → Fin
+    [No] → Mostrar error → Reintentar
+  [No] → Sugerir otros médicos → Retornar
+```
+
+**Carril 3: Sistema de Notificaciones**
+```
+Recibir solicitud → Generar mensaje → 
+Canal [Email/SMS] →
+  [Email] → Enviar correo electrónico → Confirmar envío → Fin
+  [SMS] → Enviar mensaje de texto → Confirmar envío → Fin
+```
+
+### Puntos críticos identificados:
+
+1. **Validación de disponibilidad**: El sistema debe verificar en tiempo real que el médico tenga cupos
+2. **Validación de datos**: Antes de registrar, se verifica que la información del paciente sea correcta
+3. **Notificación dual**: El sistema puede enviar confirmación por email o SMS según preferencia
+
+---
+
+## 📋 Elementos BPMN identificados en el proceso
+
+| Elemento | Tipo | Cantidad | Ubicación |
+|----------|------|----------|-----------|
+| Eventos de inicio | ⭕ | 3 | Inicio de cada carril |
+| Eventos de fin | 🔴 | 5 | Finales múltiples |
+| Tareas manuales | 📋 | 9 | Acciones del paciente y sistema |
+| Tareas del sistema | 📊 | 3 | Procesos automatizados |
+| Gateways exclusivos | 💎 | 3 | Decisiones binarias |
+| Eventos de mensaje | 📧 | 4 | Comunicación entre carriles |
+
+---
 
 ## 🔁 Tareas definidas para complementar el taller
 
 | Tarea asignada | Responsable | Fecha estimada |
 |----------------|-------------|----------------|
-| Digitalizar modelo BPMN del caso base | [Nombre] | [Fecha] |
-| Adaptar modelo al cliente real | [Nombre] | [Fecha] |
+| Revisar y validar el diagrama BPMN del caso base | [Nombre] | [Fecha] |
+| Identificar cliente real para aplicación del modelo | [Nombre] | [Fecha] |
+| Adaptar modelo BPMN al cliente real | [Nombre] | [Fecha] |
 | Redacción del informe técnico | [Nombre] | [Fecha] |
 | Investigación sobre buenas prácticas BPMN | [Nombre] | [Fecha] |
 | Compilación de referencias bibliográficas | [Nombre] | [Fecha] |
-| Revisión final y entrega | Equipo completo | [Fecha] |
+| Revisión final del trabajo de clase | Equipo completo | [Fecha] |
+
+---
 
 ## 📝 Observaciones y retroalimentación del docente
 
-_Espacio para anotar comentarios y sugerencias recibidas durante la clase:_
+_Espacio para anotar comentarios recibidos durante la clase:_
 
-- Asegurarse de usar la notación BPMN correcta para cada elemento
-- Mantener el diagrama limpio y legible
-- Documentar supuestos tomados durante el modelado
-- Incluir manejo de excepciones en el flujo
+- 
+- 
+- 
+
+---
+
+## 🎯 Aprendizajes de la sesión
+
+- Comprensión de la notación BPMN 2.0 y sus elementos básicos
+- Uso de swimlanes para separar responsabilidades entre actores
+- Identificación de gateways para representar decisiones
+- Uso de eventos de mensaje para comunicación entre procesos
+- Importancia de definir flujos alternativos y manejo de excepciones
+- Aplicación práctica de BPMN a un caso real de salud
 
 ---
 
